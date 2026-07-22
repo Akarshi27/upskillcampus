@@ -78,8 +78,8 @@ http://127.0.0.1:5000
 
 
 ## 👩‍💻 Built By
-**Vaishnavi Dattatray Mhaske**
-UCT upSkill Campus — ML Internship 2026
+**Akarshi Srivastava**
+UCT upSkill Campus — DS and ML Internship 2026
 
 
 
