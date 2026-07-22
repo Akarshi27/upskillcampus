@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Yield Prediction</title>
+
+    <!-- Link to our CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ── HEADER ─────────────────────────────────────────── -->
+    <header>
+        <div class="header-content">
+            <span class="header-icon">🌾</span>
+            <div>
+                <h1>Crop Yield Prediction</h1>
+                <p>Predict agricultural crop yield using Machine Learning</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- ── MAIN CONTENT ───────────────────────────────────── -->
+    <main>
+
+        <!-- Project Info Cards -->
+        <div class="info-cards">
+            <div class="card">
+                <span class="card-icon">🤖</span>
+                <h3>Algorithm</h3>
+                <p>Random Forest Regressor</p>
+            </div>
+            <div class="card">
+                <span class="card-icon">📊</span>
+                <h3>Accuracy</h3>
+                <p>R² Score: 0.9643</p>
+            </div>
+            <div class="card">
+                <span class="card-icon">🌱</span>
+                <h3>Dataset</h3>
+                <p>India Crop Data 2001-2014</p>
+            </div>
+            <div class="card">
+                <span class="card-icon">🏆</span>
+                <h3>MAE Score</h3>
+                <p>28.44 Quintal/Hectare</p>
+            </div>
+        </div>
+
+        <!-- ── PREDICTION FORM ──────────────────────────── -->
+        <div class="form-container">
+            <h2>Enter Crop Details</h2>
+            <p class="form-subtitle">Fill in the details below to predict crop yield</p>
+
+            <!-- Form sends data to /predict route in app.py -->
+            <form action="/predict" method="POST">
+
+                <!-- Row 1: Crop and State -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="crop">🌾 Select Crop</label>
+                        <select name="crop" id="crop" required>
+                            <option value="">-- Select Crop --</option>
+                            <!-- Loop through crops list sent from Flask -->
+                            {% for crop in crops %}
+                                <option value="{{ crop }}"
+                                    {% if selected_crop == crop %}selected{% endif %}>
+                                    {{ crop }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="state">📍 Select State</label>
+                        <select name="state" id="state" required>
+                            <option value="">-- Select State --</option>
+                            <!-- Loop through states list sent from Flask -->
+                            {% for state in states %}
+                                <option value="{{ state }}"
+                                    {% if selected_state == state %}selected{% endif %}>
+                                    {{ state }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 2: Cost inputs -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cost_a2fl">💰 Cost of Cultivation A2+FL (Rs/Hectare)</label>
+                        <input type="number"
+                               name="cost_a2fl"
+                               id="cost_a2fl"
+                               placeholder="e.g. 9794"
+                               step="0.01"
+                               required>
+                        <small>Average farming cost per hectare</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cost_c2">💰 Cost of Cultivation C2 (Rs/Hectare)</label>
+                        <input type="number"
+                               name="cost_c2"
+                               id="cost_c2"
+                               placeholder="e.g. 23076"
+                               step="0.01"
+                               required>
+                        <small>Total cost including rent and interest</small>
+                    </div>
+                </div>
+
+                <!-- Row 3: Cost of Production -->
+                <div class="form-row single">
+                    <div class="form-group">
+                        <label for="cost_prod_c2">🏭 Cost of Production C2 (Rs/Quintal)</label>
+                        <input type="number"
+                               name="cost_prod_c2"
+                               id="cost_prod_c2"
+                               placeholder="e.g. 1941"
+                               step="0.01"
+                               required>
+                        <small>Cost to produce one quintal of crop</small>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="predict-btn">
+                    🔍 Predict Yield
+                </button>
+
+            </form>
+        </div>
+
+        <!-- ── RESULT BOX ────────────────────────────────── -->
+        <!-- Only shows when prediction is available -->
+        {% if prediction is not none %}
+        <div class="result-box success">
+            <div class="result-icon">✅</div>
+            <h2>Predicted Crop Yield</h2>
+            <div class="result-value">
+                {{ prediction }}
+                <span class="result-unit">Quintal / Hectare</span>
+            </div>
+            <div class="result-details">
+                <span>🌾 Crop: <strong>{{ selected_crop }}</strong></span>
+                <span>📍 State: <strong>{{ selected_state }}</strong></span>
+            </div>
+            <p class="result-note">
+                This prediction is based on Random Forest model
+                trained on India agriculture data (R² = 0.9643)
+            </p>
+        </div>
+        {% endif %}
+
+        <!-- ── ERROR BOX ─────────────────────────────────── -->
+        {% if error %}
+        <div class="result-box error">
+            <div class="result-icon">❌</div>
+            <h2>Something went wrong</h2>
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+
+        <!-- ── HOW IT WORKS ──────────────────────────────── -->
+        <div class="how-it-works">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <h4>Enter Details</h4>
+                    <p>Select crop, state and enter cultivation costs</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <h4>ML Processes</h4>
+                    <p>Random Forest model analyzes the input data</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <h4>Get Prediction</h4>
+                    <p>Receive predicted yield in Quintal/Hectare</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+   
+
+</body>
+</html>
